@@ -1,0 +1,153 @@
+.user-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+.user-card {
+    width: 100%;
+    max-width: 520px;
+    padding: 32px;
+    border: 1px solid #e1e6ef;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 18px 45px rgba(23, 32, 51, 0.08);
+}
+
+.user-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.user-avatar {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #2f6fed;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.user-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.user-header p {
+    margin: 0;
+    color: #657084;
+    font-size: 14px;
+}
+
+.user-error {
+    margin: 0 0 18px;
+    padding: 10px 12px;
+    border: 1px solid #f0b8b8;
+    border-radius: 6px;
+    background: #fff2f2;
+    color: #b42318;
+    font-size: 14px;
+}
+
+.user-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid #e7ecf3;
+}
+
+.user-info-list div {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e7ecf3;
+}
+
+.user-info-list dt {
+    color: #657084;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.user-info-list dd {
+    margin: 0;
+    color: #172033;
+    font-size: 15px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.user-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.user-actions button {
+    border: 0;
+    border-radius: 6px;
+    padding: 11px 16px;
+    background: #2f6fed;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.user-actions button:hover {
+    background: #255ed0;
+}
+
+.user-actions .secondary-button {
+    border: 1px solid #ccd4e0;
+    background: #ffffff;
+    color: #303a4f;
+}
+
+.user-actions .secondary-button:hover {
+    background: #f0f3f8;
+}
+
+@media (max-width: 520px) {
+    .user-page {
+        align-items: flex-start;
+        padding-top: 28px;
+    }
+
+    .user-card {
+        padding: 24px;
+    }
+
+    .user-header {
+        align-items: flex-start;
+    }
+
+    .user-info-list div {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .user-actions {
+        flex-direction: column;
+    }
+
+    .user-actions button {
+        width: 100%;
+    }
+}

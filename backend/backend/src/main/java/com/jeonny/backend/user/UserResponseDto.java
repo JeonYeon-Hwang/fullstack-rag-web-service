@@ -1,5 +1,5 @@
 package com.jeonny.backend.user;
 
-public class UserResponseDto {
+public record UserResponseDto(String username, String nickname) {
     
 }
