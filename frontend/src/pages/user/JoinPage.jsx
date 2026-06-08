@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./JoinPage.css";
 
 const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
@@ -13,6 +13,8 @@ function JoinPage(){
     const [nickname, setNickname] = useState("");
     const [error, setError] = useState("");
 
+    /* 사용할 객체 */
+    const navigate = useNavigate();
 
     /* 호출 함수들 */
     /* 입력값 검증: 상시 */
@@ -51,7 +53,7 @@ function JoinPage(){
 
         /* 검증 로직 */
         if(
-            username.lenght < 4 ||
+            username.length < 4 ||
             password.length < 4 ||
             nickname.trim() === ""
         ){
@@ -70,7 +72,7 @@ function JoinPage(){
             });
 
             if(!res.ok) throw new Error("회원가입 실패");
-            Navigate("/login");
+            navigate("/login");
 
         }catch{
             setError("회원가입 중 오류가 발생했습니다.");
@@ -111,7 +113,7 @@ function JoinPage(){
                             type="text"
                             placeholder="비밀번호 (4자 이상)"
                             value={password}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                             minLength={4}
                         />
@@ -123,7 +125,7 @@ function JoinPage(){
                             type="text"
                             placeholder="닉네임"
                             value={nickname}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => setNickname(e.target.value)}
                             required
                             minLength={4}
                         />

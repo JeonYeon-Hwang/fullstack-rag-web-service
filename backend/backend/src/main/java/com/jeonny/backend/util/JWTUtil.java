@@ -18,7 +18,7 @@ public class JWTUtil {
     /* 실행 시 가장 먼저 작동 */
     static {
         /* 시크릿 키 생성 */
-        String secretKeyString = "yeonnyTheHwangIsSomeone";
+        String secretKeyString = "yeonnyTheHwangIsSomeoneWhoCanHandleExtremeCondition";
         secretKey = new SecretKeySpec(
                 secretKeyString.getBytes(StandardCharsets.UTF_8),
                 "HmacSHA256"
@@ -61,12 +61,23 @@ public class JWTUtil {
             if(type == null) return false;
 
             if(isAccess && !type.equals("access")) return false;
-            if(!isAccess && type.equals("refresh")) return false;
+            if(!isAccess && !type.equals("refresh")) return false;
 
             return true;
         
         } catch (JwtException | IllegalArgumentException e){
             return false;
         }
+    }
+
+    /* username 뽑기 */
+    public static String getUsername(String token){
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("sub", String.class);
     }
 }
