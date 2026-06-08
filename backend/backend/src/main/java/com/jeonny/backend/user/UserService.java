@@ -1,5 +1,7 @@
 package com.jeonny.backend.user;
 
+import java.util.Map;
+
 import org.springframework.security.access.AccessDeniedException;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jeonny.backend.jwt.JwtService;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,10 +22,11 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     @Transactional(readOnly = true)
     public Boolean existUser(UserRequestDto dto){
-        return userRepository.existByUsername(dto.getUsername());
+        return userRepository.existsByUsername(dto.getUsername());
     }
 
 
@@ -40,7 +45,7 @@ public class UserService {
     /* 회원가입 */
     @Transactional
     public Long addUser(UserRequestDto dto) throws AccessDeniedException {
-        if(userRepository.existByUsername(dto.getUsername())){
+        if(userRepository.existsByUsername(dto.getUsername())){
             throw new IllegalArgumentException("이미 유저가 존재합니다.");
         }
 
@@ -54,9 +59,8 @@ public class UserService {
     }
 
 
-    /* 로그인 */
+    /* username으로 정보 찾기 */
     @Transactional(readOnly = true)
-    // @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity entity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
@@ -76,5 +80,21 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다.")); 
     
         return new UserResponseDto(username, entity.getNickname());
+    }
+
+    /* 로그인 */
+    @Transactional
+    public Map<String, String> login(UserRequestDto dto){
+        String username = dto.getUsername();
+        UserDetails userDetails = loadUserByUsername(username);
+        
+        /* 원본 pwd와 인코딩된 pwd와 비교 */
+        if(!passwordEncoder.matches(dto.getPassword(), userDetails.getPassword())){
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        /* 토큰 발급 개시 */
+        Map<String, String> tokens = jwtService.issueToken(username);
+        return tokens;
     }
 }

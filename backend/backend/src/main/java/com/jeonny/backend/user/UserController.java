@@ -18,7 +18,7 @@ public class UserController {
     
     private final UserService userService;
 
-    /* 자체 로그인 & 유저 존재 확인 */
+    /* 유저 존재 확인 */
     @PostMapping(value = "/user/exist", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> existUserApi(
         @RequestBody UserRequestDto dto
@@ -42,5 +42,15 @@ public class UserController {
     @GetMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserResponseDto userMeApi(){
         return userService.readUser();
+    }
+
+    /* 자체 로그인 */
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, String>> loginApi(
+        @RequestBody UserRequestDto dto
+    ){
+        Map<String, String> tokens = userService.login(dto);
+        
+        return ResponseEntity.ok(tokens);
     }
 }

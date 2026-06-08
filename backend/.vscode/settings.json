@@ -1,4 +1,17 @@
 {
     "java.compile.nullAnalysis.mode": "disabled",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "askForPassword": true,
+            "driver": "PostgreSQL",
+            "name": "yeonny",
+            "database": "yeonny",
+            "username": "postgres"
+        }
+    ]
 }

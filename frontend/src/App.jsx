@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import JoinPage from "./pages/user/JoinPage";
 import LoginPage from "./pages/user/LoginPage";
 import UserPage from "./pages/user/UserPage";
+import CreatePostPage from "./pages/post/CreatePostPage";
 
 import './App.css'
 
@@ -14,6 +15,7 @@ function App() {
           <Route path="/join" element={<JoinPage/>}/>
           <Route path="/login" element={<LoginPage/>}/>
           <Route path="/user" element={<UserPage/>}/>
+          <Route path="/post" element={<CreatePostPage/>}/>
         </Routes>
       </BrowserRouter>
     </>
