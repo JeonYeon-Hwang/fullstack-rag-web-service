@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,5 +44,14 @@ public class PostController {
         List<PostResponseDto> posts = postService.getPosts();
 
         return ResponseEntity.ok(posts);
+    }
+
+
+    /* 글 하나 보여주기 */
+    @GetMapping(value = "/post/{postId}")
+    public ResponseEntity<PostResponseDto> getPost(
+        @PathVariable Long postId
+    ){
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 }

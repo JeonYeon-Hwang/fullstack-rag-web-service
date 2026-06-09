@@ -24,7 +24,6 @@ import lombok.Setter;
 @Table(name = "post_entity")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostEntity {
