@@ -87,10 +87,10 @@
 
 .login-actions button {
     width: 100%;
-    border: 1px solid #da680b;
+    border: 1px solid #0074cc;
     border-radius: 3px;
     padding: 12px 18px;
-    background: #f48024;
+    background: #0095ff;
     color: #ffffff;
     font-size: 15px;
     font-weight: 700;
@@ -98,7 +98,7 @@
 }
 
 .login-actions button:hover {
-    background: #da680b;
+    background: #0074cc;
 }
 
 @media (max-width: 480px) {

@@ -12,6 +12,9 @@ function CreatePostPage(){
     const [tags, setTags] = useState("");
     const [error, setError] = useState("");
 
+    /* 자원 가져오기 */
+    const accessToken = localStorage.getItem("accessToken");
+
     /* 글 등록 이벤트 */
     const handleCreatePost = async (e) => {
         e.preventDefault();
@@ -31,7 +34,10 @@ function CreatePostPage(){
             /* 백엔드 접근 */
             const res = await fetch(`${BACKEND_API_BASE_URL}/post`,{
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
+                },
                 credentials: "include",
                 body: JSON.stringify({title, content, tags}),
             });
