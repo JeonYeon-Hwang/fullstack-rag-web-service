@@ -6,7 +6,7 @@ export async function refreshAccessToken(params) {
     const refreshToken  = localStorage.getItem("refreshToken");
     if(!refreshToken) throw new Error("Refresh Token이 없습니다.");
 
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_BASE_URL}/jwt/refresh`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_API_BASE_URL}/jwt/exchange`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({refreshToken}),     
@@ -16,7 +16,6 @@ export async function refreshAccessToken(params) {
 
     const data = await response.json();
     localStorage.setItem("accessToken", data.accessToken);
-    localStorage.setItem("refreshToken", data.refreshToken);
 
     return data.accessToken;
 }

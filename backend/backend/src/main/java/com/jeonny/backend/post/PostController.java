@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,7 +41,7 @@ public class PostController {
 
     /* 글 전체 보여주기 */
     @GetMapping(value = "/post")
-    public ResponseEntity<List<PostResponseDto>> getPosts(){
+    public ResponseEntity<List<PostResponseDto>> getPostsApi(){
         List<PostResponseDto> posts = postService.getPosts();
 
         return ResponseEntity.ok(posts);
@@ -49,9 +50,18 @@ public class PostController {
 
     /* 글 하나 보여주기 */
     @GetMapping(value = "/post/{postId}")
-    public ResponseEntity<PostResponseDto> getPost(
+    public ResponseEntity<PostResponseDto> getPostApi(
         @PathVariable Long postId
     ){
         return ResponseEntity.ok(postService.getPost(postId));
+    }
+
+
+    /* 글 하나 수정하기 */
+    @PutMapping(value = "/post/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updatePostApi(
+        @RequestBody PostRequestDto dto
+    ){
+        return ResponseEntity.noContent().build();
     }
 }

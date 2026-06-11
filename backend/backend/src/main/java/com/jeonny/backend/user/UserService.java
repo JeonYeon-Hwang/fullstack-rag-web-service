@@ -97,4 +97,11 @@ public class UserService {
         Map<String, String> tokens = jwtService.issueToken(username);
         return tokens;
     }
+
+
+    /* 로그아웃 */
+    @Transactional
+    public void logout(String refreshToken){
+        jwtService.removeRefresh(refreshToken);
+    }
 }

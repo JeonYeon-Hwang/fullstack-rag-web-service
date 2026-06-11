@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Navbar from "./components/Navbar";
 import JoinPage from "./pages/user/JoinPage";
 import LoginPage from "./pages/user/LoginPage";
 import UserPage from "./pages/user/UserPage";
@@ -13,6 +14,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <Navbar/>
         <Routes>
           <Route path="/join" element={<JoinPage/>}/>
           <Route path="/login" element={<LoginPage/>}/>

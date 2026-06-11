@@ -26,3 +26,11 @@ CREATE TABLE post_tag (
     post_id BIGINT NOT NULL REFERENCES post_entity(id),
     tag VARCHAR(255)
 );
+
+CREATE TABLE comment_entity (
+    id BIGINT PRIMARY KEY,
+    postId BIGINT,
+    userId BIGINT,
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

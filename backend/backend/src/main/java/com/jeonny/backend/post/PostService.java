@@ -1,12 +1,14 @@
 package com.jeonny.backend.post;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.jeonny.backend.comment.CommentRepository;
 import com.jeonny.backend.user.UserEntity;
 import com.jeonny.backend.user.UserRepository;
 
@@ -20,6 +22,7 @@ public class PostService {
     
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     /* 글 추가하기 */
     @Transactional
@@ -53,7 +56,8 @@ public class PostService {
                 .stream()
                 .map(post -> {
                     UserEntity user = userRepository.findById(post.getUserId()).orElseThrow();
-                    return PostResponseDto.from(post, user);
+                    Integer comment_num = commentRepository.countByPostId(post.getId());
+                    return PostResponseDto.from(post, user, comment_num);
                 })
                 .toList();
     }
@@ -67,6 +71,22 @@ public class PostService {
         UserEntity user_entity = userRepository.findById(post_entity.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
-        return PostResponseDto.from(post_entity, user_entity);
+        return PostResponseDto.from(post_entity, user_entity, null);
+    }
+
+
+    /* 글 하나 수정하기 */
+    @Transactional
+    public Boolean updatePost(PostRequestDto dto){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        Optional<UserEntity> user_entity = userRepository.findByUsername(username);
+        if(user_entity.isEmpty()) return false;
+
+       
+        
+
+        return true;
     }
 }

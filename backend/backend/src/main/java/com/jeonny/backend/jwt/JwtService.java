@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jeonny.backend.util.JWTUtil;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -54,6 +55,7 @@ public class JwtService {
 
     }
 
+
     /* Jwt 토큰을 만드는 실제 서비스 */
     @Transactional
     public Map<String, String> issueToken(String username){
@@ -69,5 +71,21 @@ public class JwtService {
             "accessToken", accessToken,
             "refreshToken", refreshToken
         );
+    }
+
+
+    /* refresh기준 access 재발급 */
+    @Transactional
+    public String newAccessToken(String refreshToken){
+        /* 해당 토큰 존재 유무 확인 */
+        if(!existByRefresh(refreshToken)){
+            throw new EntityNotFoundException("해당 refresh 토큰이 없습니다.");
+        }
+        
+        /* username 뽑기 => 이를 기준으로 재발급 */
+        String username = JWTUtil.getUsername(refreshToken);
+        String accessToken = JWTUtil.createJWT(username, true);
+
+        return accessToken;
     }
 }

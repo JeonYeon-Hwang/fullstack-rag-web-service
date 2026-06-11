@@ -4,18 +4,21 @@ body:has(.create-post-page) {
     color: #232629;
 }
 
+.create-post-page {
+    background: linear-gradient(to right, #ffffff 0, #ffffff calc(50% + 380px), #f6f6f6 calc(50% + 380px), #f6f6f6 100%);
+}
+
 .create-post-page form {
     width: 100%;
     max-width: 760px;
-    margin: 48px auto;
+    min-height: calc(100vh - 55px);
+    margin: 0 auto;
     padding: 32px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 16px;
     background: #ffffff;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(35, 38, 41, 0.08);
 }
 
 .create-post-page form::before {

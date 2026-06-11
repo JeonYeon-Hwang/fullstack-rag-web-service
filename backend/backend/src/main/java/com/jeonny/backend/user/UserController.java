@@ -53,4 +53,15 @@ public class UserController {
         
         return ResponseEntity.ok(tokens);
     }
+
+    /* 로그아웃: refresh 삭제 */
+    @PostMapping(value = "/logout", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> logoutApi(
+        @RequestBody Map<String, String> body
+    ){
+        String refreshToken = body.get("refreshToken");
+        userService.logout(refreshToken);
+        
+        return ResponseEntity.noContent().build();
+    }
 }
