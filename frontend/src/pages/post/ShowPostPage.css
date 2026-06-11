@@ -73,3 +73,116 @@ body:has(.show-post-page) {
     margin-right: 8px;
     color: #9fa6ad;
 }
+
+.comments-section {
+    margin-top: 24px;
+}
+
+.comments-section h2 {
+    margin: 0 0 20px;
+    color: #232629;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.comment-card {
+    padding: 16px 0;
+    border-bottom: 1px solid #d6d9dc;
+}
+
+.comment-author {
+    margin: 0;
+    color: #0074cc;
+    font-size: 14px;
+    text-align: right;
+}
+
+.comment-content {
+    margin: 0 0 10px;
+    white-space: pre-wrap;
+    color: #232629;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.comment-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 4px;
+}
+
+.comment-date {
+    margin: 0;
+    color: #9fa6ad;
+    font-size: 12.65px;
+    text-align: right;
+    white-space: pre;
+}
+
+.comment-edit-button {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: #9fa6ad;
+    font-size: 12.65px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.comment-edit-button:hover {
+    color: #3b4045;
+}
+
+.comment-form {
+    margin-top: 0;
+    padding-top: 24px;
+}
+
+.comment-form p {
+    margin: 0 0 8px;
+    color: #232629;
+    font-size: 18px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    min-height: 120px;
+    box-sizing: border-box;
+    border: 1px solid #babfc4;
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: #232629;
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+}
+
+.comment-form textarea:focus {
+    border-color: #f48024;
+    box-shadow: 0 0 0 3px rgba(244, 128, 36, 0.18);
+}
+
+.comment-actions {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.comment-actions button {
+    border: 1px solid #005999;
+    border-radius: 4px;
+    padding: 8px 16px;
+    background: #0074cc;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.comment-actions button:hover {
+    background: #005999;
+}

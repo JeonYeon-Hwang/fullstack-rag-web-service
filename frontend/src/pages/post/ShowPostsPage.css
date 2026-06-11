@@ -5,11 +5,23 @@ body:has(.show-posts-page) {
 }
 
 .show-posts-page {
+    position: relative;
     width: 100%;
     max-width: 874px;
-    margin: 48px auto;
+    margin: 24px auto 48px;
     padding: 0 20px;
     box-sizing: border-box;
+}
+
+.show-posts-page::before {
+    content: "";
+    position: absolute;
+    top: -24px;
+    bottom: 0;
+    left: 20px;
+    width: 1px;
+    background: #d6d9dc;
+    pointer-events: none;
 }
 
 .posts-header {
@@ -23,13 +35,13 @@ body:has(.show-posts-page) {
     margin: 0;
     padding-left: 12px;
     color: #232629;
-    font-size: 35px;
+    font-size: 30px;
     font-weight: 400;
 }
 
 .posts-header button {
     border: 1px solid #005999;
-    border-radius: 4px;
+    border-radius: 5px;
     padding: 8px 16px;
     background: #0074cc;
     color: #ffffff;
@@ -50,9 +62,34 @@ body:has(.show-posts-page) {
 }
 
 .post-card {
+    display: grid;
+    grid-template-columns: 1fr 8fr;
+    gap: 20px;
     padding: 20px 44px;
     border: 1px solid #d6d9dc;
     background: #ffffff;
+}
+
+.post-comment-count {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 2px;
+}
+
+.post-comment-count span {
+    display: inline-block;
+    margin-left: auto;
+    border: 1px solid #2f8f46;
+    border-radius: 4px;
+    padding: 4px 7px;
+    color: #2f8f46;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.post-main {
+    min-width: 0;
 }
 
 .post-card h2 {

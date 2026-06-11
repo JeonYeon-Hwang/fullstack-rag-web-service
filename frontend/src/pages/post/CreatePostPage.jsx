@@ -14,6 +14,9 @@ function CreatePostPage(){
 
     /* 자원 가져오기 */
     const accessToken = localStorage.getItem("accessToken");
+    
+    const navigate = useNavigate();
+
 
     /* 글 등록 이벤트 */
     const handleCreatePost = async (e) => {
@@ -43,6 +46,8 @@ function CreatePostPage(){
             });
 
             if(!res.ok) throw new Error("글 등록 실패");
+
+            navigate("/");
 
         }catch{
             setError("글 등록 중 오류가 발생하였습니다.");

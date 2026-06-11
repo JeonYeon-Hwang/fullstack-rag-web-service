@@ -42,6 +42,19 @@ function ShowPostsPage(){
         navigate(`/post/${postId}`);
     };
 
+    /* 글 작성으로 넘어가기 */
+    const handleCreatePostClick = () => {
+        const accessToken = localStorage.getItem("accessToken");
+
+        if(!accessToken){
+            alert("로그인이 필요합니다");
+            return;
+        }
+
+        navigate("/post");
+    };
+
+
     /* 날짜 형식 변환 */
     const formatCreatedAt = (createdAt) => {
         const date = new Date(createdAt);
@@ -54,15 +67,16 @@ function ShowPostsPage(){
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
         const hour = String(date.getHours()).padStart(2, "0");
+        const minute = String(date.getMinutes()).padStart(2, "0");
 
-        return `${year}/${month}/${day} ${hour}시`;
+        return `${year}.${month}.${day} ${hour}:${minute}`;
     };
 
     return (
         <div className="show-posts-page">
             <div className="posts-header">
                 <h1>질문 목록</h1>
-                <button type="button" onClick={() => navigate("/post")}>질문하기</button>
+                <button type="button" onClick={handleCreatePostClick}>질문하기</button>
             </div>
 
             <div className="posts-count">
@@ -75,17 +89,22 @@ function ShowPostsPage(){
                     key={post.id}
                     onClick={() => handlePostClick(post.postId)}
                 >
-                    <h2>{post.title}</h2>
-                    <p className="post-content">{post.content}</p>
-                    <div className="post-footer">
-                        <div className="post-tags">
-                            {post.tags.map((tag) => (
-                                <span key={tag}>{tag}</span>
-                            ))}
-                        </div>
-                        <div className="post-meta">
-                            <span className="post-nickname">{post.nickname}</span>
-                            <span className="post-created-at">{formatCreatedAt(post.createdAt)}</span>
+                    <div className="post-comment-count">
+                        <span>{post.comment_num}개 답변</span>
+                    </div>
+                    <div className="post-main">
+                        <h2>{post.title}</h2>
+                        <p className="post-content">{post.content}</p>
+                        <div className="post-footer">
+                            <div className="post-tags">
+                                {post.tags.map((tag) => (
+                                    <span key={tag}>{tag}</span>
+                                ))}
+                            </div>
+                            <div className="post-meta">
+                                <span className="post-nickname">{post.nickname}</span>
+                                <span className="post-created-at">{formatCreatedAt(post.createdAt)}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

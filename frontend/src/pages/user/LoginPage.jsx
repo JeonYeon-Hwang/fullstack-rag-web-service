@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 
 const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
@@ -8,6 +9,8 @@ function LoginPage(){
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     /* 로그인 실행 */
     const handleLogin = async (e) => {
@@ -38,6 +41,9 @@ function LoginPage(){
             const data = await res.json();
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
+
+            /* 성공 시: 본 화면으로 이동 */
+            navigate("/");
 
         }catch{
             setError("아이디 또는 비밀번호가 틀렸습니다.");
