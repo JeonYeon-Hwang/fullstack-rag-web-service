@@ -1,0 +1,7 @@
+ai-core/venv/
+ai-core/.env
+backend/backend/.env
+frontend/.env
+
+__pycache__/
+*.pyc
