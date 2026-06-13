@@ -5,6 +5,7 @@ body:has(.create-post-page) {
 }
 
 .create-post-page {
+    position: relative;
     background: linear-gradient(to right, #ffffff 0, #ffffff calc(50% + 380px), #f6f6f6 calc(50% + 380px), #f6f6f6 100%);
 }
 
@@ -21,16 +22,91 @@ body:has(.create-post-page) {
     background: #ffffff;
 }
 
-.create-post-page form::before {
-    content: "질문하기";
-    margin-bottom: 8px;
+.recommend-panel {
+    position: absolute;
+    top: 32px;
+    left: calc(50% + 380px);
+    width: 360px;
+    box-sizing: border-box;
+    padding: 32px;
+}
+
+.recommend-panel h1 {
+    margin: 0 0 16px;
     color: #232629;
-    font-size: 28px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.recommend-panel h2 {
+    color: #0074cc;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.recommend-card {
+    margin-bottom: 12px;
+    padding: 8px 16px 16px;
+    border: 1px solid #e3e6e8;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.recommend-card:hover {
+    border-color: #d0d6dc;
+    background: #f3f4f5;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.recommend-panel p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.recommend-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.recommend-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    background: #e3e6e8;
+    color: #3b4045;
+    font-size: 10px;
     font-weight: 700;
 }
 
 .create-post-page form > div {
     width: 100%;
+}
+
+.create-post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.create-post-header h1 {
+    margin: 0;
+    color: #232629;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.create-post-header .required-note {
+    margin: 0;
+    color: #232629;
+    font-size: 13px;
 }
 
 .create-post-page label {

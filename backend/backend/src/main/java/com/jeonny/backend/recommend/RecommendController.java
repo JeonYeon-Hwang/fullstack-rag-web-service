@@ -1,10 +1,9 @@
-﻿package com.jeonny.backend.recommend;
+package com.jeonny.backend.recommend;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +24,7 @@ public class RecommendController {
     private String pythonAiServerUrl;
     
     /* 작성 글 발송 로직 */
-    @PostMapping
+    @PostMapping("/recommend")
     public ResponseEntity<List<PostResponseDto>> getRecommendation(
         @RequestBody Map<String, String> requesBody
     ){
