@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { recommend } from "../../util/aiUtil";
 import "./CreatePostPage.css";
 
 const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
@@ -12,6 +13,9 @@ function CreatePostPage(){
     const [tags, setTags] = useState("");
     const [error, setError] = useState("");
 
+    /* 추천 글 변수 */
+    const [recommends, setRecommends] = useState([]);
+
     /* 자원 가져오기 */
     const accessToken = localStorage.getItem("accessToken");
     
@@ -22,6 +26,7 @@ function CreatePostPage(){
     const handleCreatePost = async (e) => {
         e.preventDefault();
         setError("");
+        return;
 
         /* 검증 로직 */
         if(
@@ -54,10 +59,26 @@ function CreatePostPage(){
         }
     }
 
+    /* 글 추천 이벤트 */
+    const handleRecommendPost = async () => {
+        setError("");
+
+        const data = await recommend(content);
+        if(!data){
+            setError("추천 글을 불러오지 못했습니다.");
+        }
+
+        setRecommends(data);
+    }
 
     return (
         <div className="create-post-page">
             <form onSubmit={handleCreatePost}>
+                <div className="create-post-header">
+                    <h1>질문하기</h1>
+                    <p className="required-note">필수 사항<span className="required-mark">*</span></p>
+                </div>
+
                 <div>
                     <label>제목 <span className="required-mark">*</span></label>
                     <p>제목(10자 이상)</p>
@@ -70,7 +91,7 @@ function CreatePostPage(){
 
                 <div>
                     <label>내용 <span className="required-mark">*</span></label>
-                    <p>내용(30자 이상)</p>
+                    <p>30자 이상 입력 시, AI가 유사한 질문 글을 추천해드려요</p>
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
@@ -91,6 +112,28 @@ function CreatePostPage(){
                     <button type="submit">글 등록하기</button>
                 </div>
             </form>
+            <div className="recommend-panel">
+                <button  type="button" onClick={handleRecommendPost}>글 추천하기</button>
+                <h1>AI가 비슷한 질문을 찾았습니다</h1>
+                {recommends && recommends.map((post) => (
+                    <div
+                        className="recommend-card"
+                        key={post.postId}
+                    >
+                        <div >
+                            <h2>{post.title}</h2>
+                            <p>{post.content}</p>
+                            <div className="recommend-tags">
+                                {post.tags?.map((tag) => (
+                                    <span className="recommend-tag" key={tag}>
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ))}        
+            </div>
         </div>
     );
 }
