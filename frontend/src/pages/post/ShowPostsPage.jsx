@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ShowPostsPage.css";
 
@@ -8,16 +8,23 @@ function ShowPostsPage(){
 
     /* 저장용 변수 */
     const [posts, setPosts] = useState([]);
+    const [page, setPage] = useState(0);
     const [error, setError] = useState('');
+    const [size, setSize] = useState(10);
+    const [postNum, setPostNum] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    
     const navigate = useNavigate();
+    const sentinelRef = useRef(null);
 
-    /* 첫 페이지 접근 시: 글 목록 불러오기 */
+    /* page 기반하여 글 반환하기 */
     useEffect(() => {
         const posts = async () => {
 
             try{
+                setIsLoading(true);
 
-                const res = await fetch(`${BACKEND_API_BASE_URL}/post`, {
+                const res = await fetch(`${BACKEND_API_BASE_URL}/post?page=${page}&size=${size}`, {
                     method: "GET",
                     credentials: "include",
                     headers: {"Content-Type": "application/json"},
@@ -26,7 +33,10 @@ function ShowPostsPage(){
                 if(!res.ok) throw new Error("글 불러오기 실패");
 
                 const data = await res.json();
-                setPosts(data);
+                
+                /* 연장해서 더하기 */
+                setPosts((prevPosts) => [...prevPosts, ...data]);
+                setIsLoading(false);
 
             }catch{
                 setError("글을 불러오지 못했습니다.");
@@ -35,7 +45,48 @@ function ShowPostsPage(){
 
         posts();
 
-    }, [])
+    }, [page, size])
+
+    /* 스크롤 감지하기 */
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) =>{
+            /* 특정 조건에만 페이지 수 증가 */
+            if(entries[0].isIntersecting && !isLoading){
+                setPage((prev) => prev + 1);
+            }
+        });
+
+        if(sentinelRef.current){
+            observer.observe(sentinelRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [isLoading]);
+
+    /* 글 총 갯수 가져오기 */
+    useEffect(() => {
+        const getNum = async () => {
+            try{
+                setError("");
+
+                const res = await fetch(`${BACKEND_API_BASE_URL}/post/count`,{
+                    method: "GET",
+                    credentials: "include",
+                });
+
+                if(!res.ok) throw new Error("글 갯수 불러오기 실패");
+
+                const data = await res.json();
+                setPostNum(data);
+
+            }catch{
+                setError("글 갯수를 가져오지 못했습니다.");
+            }
+        }
+
+        getNum();
+    });
+
 
     /* 해당 글로 넘어가기 */
     const handlePostClick = (postId) => {
@@ -80,7 +131,7 @@ function ShowPostsPage(){
             </div>
 
             <div className="posts-count">
-                {posts.length}개의 질문글이 있습니다
+                {postNum}개의 질문글이 있습니다
             </div>
 
             {posts && posts.map((post) => (
@@ -109,9 +160,8 @@ function ShowPostsPage(){
                     </div>
                 </div>
             ))}
-        </div>
-
-        
+            <div ref={sentinelRef} style={{ height: '20px' }} />
+        </div>      
     );
 }
 

@@ -34,12 +34,14 @@ public class SecurityConfig {
         /* 1. csrf 보안 비활성 
            2. cors 설정 넣기
            3. 기본 인증 필터 비활성
-           4. 로그인 경로는 모두 허용
-           5. 예외처리: 401 
+           4. 로그아웃 기본 설정 비활성
+           5. 로그인 경로는 모두 허용
+           6. 예외처리: 401 
             */
         http.csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .httpBasic(AbstractHttpConfigurer::disable)
+            .logout(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((req, res, authExp) -> {

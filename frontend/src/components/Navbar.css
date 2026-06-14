@@ -31,6 +31,10 @@
     white-space: nowrap;
 }
 
+.site-logo {
+    cursor: pointer;
+}
+
 .navbar-search-wrap {
     position: relative;
     width: 100%;

@@ -57,8 +57,32 @@ body:has(.show-post-page) {
     font-weight: 700;
 }
 
+.show-post-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 46px 0 0;
+}
+
+.show-post-edit-button {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: #9fa6ad;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.show-post-edit-button:hover {
+    color: #3b4045;
+}
+
 .show-post-author {
-    margin: 18px 0 0;
+    margin: 0;
     text-align: right;
 }
 

@@ -1,7 +1,11 @@
 package com.jeonny.backend.post;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,12 +52,14 @@ public class PostService {
     /* 글 삭제하기 */
 
 
-    /* 글 전체 보여주기 */
+    /* 글 페이지 단위로 */
     @Transactional
-    public List<PostResponseDto> getPosts(){
-        /* 해당 각 글의 작성자 nickname도 보여줘야 함 */
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
+    public List<PostResponseDto> getPosts(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<PostEntity> post_entity = postRepository.findAllByOrderByCreatedAtDesc(pageable);
+
+        return post_entity.stream()
                 .map(post -> {
                     UserEntity user = userRepository.findById(post.getUserId()).orElseThrow();
                     Integer comment_num = commentRepository.countByPostId(post.getId());
@@ -77,16 +83,62 @@ public class PostService {
 
     /* 글 하나 수정하기 */
     @Transactional
-    public Boolean updatePost(PostRequestDto dto){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+    public Boolean updatePost(Long postId, PostRequestDto dto){
+        UserEntity user_entity = getCurrentUser();
+        PostEntity post_entity = getCurrentPost(postId);
         
-        Optional<UserEntity> user_entity = userRepository.findByUsername(username);
-        if(user_entity.isEmpty()) return false;
+        /* 추가 검증: 유저는 해당 글 작성자인가? */
+        if(!isPostOwner(post_entity, user_entity)){
+            return false;
+        }
 
-       
-        
+        /* DB에 반영하기: entity를 set하는 것 만으로 충분 */
+        post_entity.setTitle(dto.getTitle());
+        post_entity.setContent(dto.getContent());
+        post_entity.setTags(
+            Arrays.stream(dto.getTags().split(","))
+                    .map(String::trim)
+                    .filter(tag -> !tag.isBlank())
+                    .toList()
+        );
 
         return true;
+    }
+
+    /* 글 하나 권한 확인하기 */
+    @Transactional
+    public PostResponseDto getPostPerm(Long postId){
+        UserEntity user = getCurrentUser();
+        PostEntity post = getCurrentPost(postId);
+
+        if(!isPostOwner(post, user)) return null;
+
+        return PostResponseDto.from(post, user, null);
+    }
+
+
+    /* 글 갯수 가져오기 */
+    @Transactional
+    public Integer getPostNum(){
+        return (int) postRepository.count();
+    }
+
+
+    /* helper 함수들 입니다 */
+    private UserEntity getCurrentUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();       
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    private PostEntity getCurrentPost(Long postId){
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));   
+    }
+
+    private Boolean isPostOwner(PostEntity postEntity, UserEntity userEntity){
+        return postEntity.getUserId().equals(userEntity.getId());
     }
 }

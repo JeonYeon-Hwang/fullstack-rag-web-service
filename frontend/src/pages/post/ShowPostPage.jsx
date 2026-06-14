@@ -17,6 +17,7 @@ function ShowPostPage(){
     const [comments, setComments] = useState([]); 
 
     const { postId } = useParams();
+    const navigate = useNavigate();
 
 
     /* 해당 글 불러오기 */
@@ -94,6 +95,37 @@ function ShowPostPage(){
         setComments(data);
     }
 
+    /* 글 수정 권한 확인 이벤트 */
+    const handleEditClick = async (postId) => {
+        setError("");
+
+        try{
+            const res = await fetchWithAcess(`${BACKEND_API_BASE_URL}/post/perm?postId=${postId}`, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if(!res.ok) throw new Error("권한 확인하기 실패");
+
+            const data = await res.json();
+            if(!data.permitted){
+                alert("수정 권한이 없습니다.");
+                return;
+            }
+
+            /* 수정 페이지로 이동: 본문 객체를 가지고 */
+            navigate("/post/update", {
+                state: {
+                    data: data.post
+                },
+            });
+
+        }catch{
+            setError("권한 확인 과정에 문제가 발생하였습니다.");
+        }
+
+    }
+
 
     /* 날짜 형식 변환 */
     const formatCreatedAt = (createdAt) => {
@@ -143,10 +175,19 @@ function ShowPostPage(){
                     <span key={tag}>{tag}</span>
                 ))}
             </div>
-            <p className="show-post-author">
-                <span className="show-post-author-label">작성자</span>
-                <span>{post?.nickname}</span>
-            </p>
+            <div className="show-post-meta-row">
+                <button
+                    className="show-post-edit-button"
+                    type="button"
+                    onClick={() => handleEditClick(post.postId)}
+                >
+                    수정하기
+                </button>
+                <p className="show-post-author">
+                    <span className="show-post-author-label">작성자</span>
+                    <span>{post?.nickname}</span>
+                </p>
+            </div>
             
             <section className="comments-section">
                 <h2>댓글 {comments?.length ?? 0}개</h2>
