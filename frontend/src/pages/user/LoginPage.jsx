@@ -42,9 +42,10 @@ function LoginPage(){
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
 
-            /* 성공 시: 본 화면으로 이동 */
+            /* 성공 시: 본 화면으로 이동
+               화면 재로드 */
             navigate("/");
-
+            window.location.reload();
         }catch{
             setError("아이디 또는 비밀번호가 틀렸습니다.");
         }
@@ -74,7 +75,7 @@ function LoginPage(){
                     <div className="form-field">
                         <label>비밀번호</label>
                         <input
-                            type="text"
+                            type="password"
                             placeholder="비밀번호 (4자 이상)"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}

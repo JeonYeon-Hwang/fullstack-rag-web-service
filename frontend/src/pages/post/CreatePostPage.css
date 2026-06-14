@@ -31,6 +31,32 @@ body:has(.create-post-page) {
     padding: 32px;
 }
 
+.recommend-panel .ai-description-notice {
+    display: block;
+    overflow: visible;
+    margin: 0 0 12px;
+    padding: 12px 14px;
+    border: 1px solid #e6d6a8;
+    border-radius: 8px;
+    background: #fbf7e6;
+    color: #3b4045;
+    font-size: 13px;
+    line-height: 1.45;
+    -webkit-line-clamp: unset;
+}
+
+.recommend-panel .ai-description-notice h1 {
+    margin: 0 0 8px;
+}
+
+.recommend-panel .ai-description-notice p {
+    display: block;
+    overflow: visible;
+    margin: 0;
+    color: inherit;
+    -webkit-line-clamp: unset;
+}
+
 .recommend-panel h1 {
     margin: 0 0 16px;
     color: #232629;
@@ -59,6 +85,74 @@ body:has(.create-post-page) {
     border-color: #d0d6dc;
     background: #f3f4f5;
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+.recommend-card-skeleton {
+    cursor: default;
+}
+
+.recommend-card-skeleton:hover {
+    border-color: #e3e6e8;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.skeleton-title,
+.skeleton-line,
+.skeleton-tags span {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #e3e6e8;
+}
+
+.skeleton-title::after,
+.skeleton-line::after,
+.skeleton-tags span::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.65),
+        transparent
+    );
+    animation: skeleton-shimmer 1.2s infinite;
+}
+
+.skeleton-title {
+    width: 72%;
+    height: 19px;
+    margin: 8px 0 14px;
+}
+
+.skeleton-line {
+    width: 100%;
+    height: 13px;
+    margin-bottom: 8px;
+}
+
+.skeleton-line.short {
+    width: 78%;
+}
+
+.skeleton-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+}
+
+.skeleton-tags span {
+    width: 44px;
+    height: 20px;
+}
+
+@keyframes skeleton-shimmer {
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .recommend-panel p {

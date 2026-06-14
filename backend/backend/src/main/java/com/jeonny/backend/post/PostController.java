@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -39,10 +40,13 @@ public class PostController {
     /* 글 삭제하기 */
 
 
-    /* 글 전체 보여주기 */
+    /* 글 페이지 단위로 보여주기*/
     @GetMapping(value = "/post")
-    public ResponseEntity<List<PostResponseDto>> getPostsApi(){
-        List<PostResponseDto> posts = postService.getPosts();
+    public ResponseEntity<List<PostResponseDto>> getPostsApi(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ){
+        List<PostResponseDto> posts = postService.getPosts(page, size);
 
         return ResponseEntity.ok(posts);
     }
@@ -59,9 +63,36 @@ public class PostController {
 
     /* 글 하나 수정하기 */
     @PutMapping(value = "/post/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updatePostApi(
-        @RequestBody PostRequestDto dto
+    public ResponseEntity<Boolean> updatePostApi(
+        @RequestBody PostRequestDto dto, @PathVariable Long postId
     ){
-        return ResponseEntity.noContent().build();
+        Boolean isUpdated = postService.updatePost(postId, dto);
+        return ResponseEntity.ok(isUpdated);
+    }
+
+    
+    /* 글 하나 권한 확인하기 */
+    @GetMapping(value = "/post/perm")
+    public ResponseEntity<Map<String, Object>> getPostPermApi(
+        @RequestParam Long postId
+    ) {
+        PostResponseDto post = postService.getPostPerm(postId);
+        if(post == null){
+            return ResponseEntity.ok(Map.of("permitted", false));
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "permitted", true,
+            "post", post
+        ));
+    }
+    
+
+    /* 총 글 갯수 반환하기 */
+    @GetMapping(value = "/post/count")
+    public ResponseEntity<Integer> getPostsNumApi(){
+        Integer postNum = postService.getPostNum();
+
+        return ResponseEntity.ok(postNum);
     }
 }

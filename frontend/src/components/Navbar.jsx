@@ -24,7 +24,7 @@ function Navbar(){
         const userInfo = async () => {
 
             try{
-                console.log("시도")
+
                 const res = await fetchWithAcess(`${BACKEND_API_BASE_URL}/user`, {
                     method: "GET",
                     credentials: "include",
@@ -51,10 +51,18 @@ function Navbar(){
         navigate("/")
     }
 
+    /* 전체 화면으로 이동하기 */
+    const handleMenuClick = () => {
+        navigate("/");
+    };
+
+
     return (
         <nav className="navbar">
             <div className="navbar-inner">
-                <h1>Stack Underflow</h1>
+                <h1 className="site-logo"
+                    onClick={handleMenuClick}
+                >Stack Underflow</h1>
                 <div className="navbar-search-wrap">
                     <span className="navbar-search-icon">⌕</span>
                     <input
