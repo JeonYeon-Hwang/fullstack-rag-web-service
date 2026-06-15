@@ -123,6 +123,7 @@ public class PostService {
         return (int) postRepository.count();
     }
 
+    
 
     /* helper 함수들 입니다 */
     private UserEntity getCurrentUser(){
