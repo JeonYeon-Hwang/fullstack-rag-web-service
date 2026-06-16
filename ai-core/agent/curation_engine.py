@@ -13,6 +13,7 @@ load_dotenv()
 
 BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL", "http://localhost:8080")
 DATABASE_URL = os.getenv("DATABASE_URL")
+PSYCOPG_DATABASE_URL = DATABASE_URL.replace("postgresql+psycopg://", "postgresql://")
 
 router = APIRouter()
 client = OpenAI()
@@ -52,17 +53,21 @@ def get_embedding_vector(post_id: int):
     """
 
     # 쿼리문 기준으로 db 접속하여 가져오기
-    with psycopg.connect(DATABASE_URL) as db:
+    with psycopg.connect(PSYCOPG_DATABASE_URL) as db:
         with db.cursor() as cur:
             cur.execute(query, ("yeonny_pgvector", str(post_id)))
-            embedding = cur.fetchone()
+            row = cur.fetchone()
 
-    if embedding is None:
+    if row is None:
         return None
     
-    return {
-        "embedding": embedding,
-    }
+    embedding_text = row[0]
+    
+    # 계산 가능한 float 형태로 바꾸기 
+    return np.array(
+        [float(x) for x in embedding_text.strip("[]").split(",")],
+        dtype=float
+    )
     
 
 # 백엔드에서 유저기반 활동기록을 가져온다
@@ -75,7 +80,7 @@ def load_user_activities(user_id):
 
     activities = [
         ActivityItem(user_id=row['userId'], post_id=row['postId'],
-                        activity_type=row['activityType'], created_at=row['created_at'])
+                        activity_type=row['activityType'], created_at=row['createdAt'])
         for row in data
     ]
 
@@ -100,6 +105,11 @@ def calculate_user_interest(activities):
         # 2. 가중치에 맞게 백터값을 조율한다
         # 3. 동시에, 총 값도 계속 더한다: 가중치 만큼 분모가 늘어남
         emb_vec = get_embedding_vector(activity.post_id)
+
+        # 임베딩 안 된 글이라면: pass
+        if emb_vec is None:
+            continue
+
         w = weights.get(activity.activity_type, 1.0)
         weighted_vectors.append(emb_vec * w)
         total_weight += w
@@ -123,18 +133,27 @@ def similarity_search(interest_vec):
             ON e.collection_id = c.uuid
         WHERE c.name = 'yeonny_pgvector'
         ORDER BY e.embedding <=> %s::vector
+        LIMIT %s
     """
 
     # 받아온 interest 백터를 문자화 
     vector_txt = "[" + ",".join(map(str, interest_vec)) + "]"
 
     # 쿼리문 기반 db 접속 & 가져오기
-    with psycopg.connect(DATABASE_URL) as db:
+    with psycopg.connect(PSYCOPG_DATABASE_URL) as db:
         with db.cursor() as cur:
-            cur.execute(query, (vector_txt, vector_txt, 3))
+            cur.execute(query, (vector_txt, vector_txt, 2))
             rows = cur.fetchall() 
 
-    return rows
+    # 객체화
+    return [
+        {
+            "title": row[0],
+            "content": row[1],
+            "distance": row[2],
+        }
+        for row in rows
+    ]
 
 
 # 뽑은 글 기준으로 뉴스레터 생성하기
@@ -156,15 +175,29 @@ def generate_newsletter(curated_posts):
         너는 전문 큐레이터야.
         내가 제공한 커뮤니티 게시글을 바탕으로, 
         해당 유저에게 뉴스레터를 한국어로 작성해.
+        반드시 JSON 형태로만 해.
         """, 
         input=f"""
         아래 게시글을 바탕으로 뉴스레터 작성할 것.
+        - title은 뉴스레터 제목으로 짧게 쓴다.
+        - summary는 1~2개의 짧은 문장으로 쓴다.
+        - reason은 왜 추천하는지 1문장으로 쓴다.
+        - item summary는 게시글 내용을 1~2문장으로 쓴다.
+        - "성능 점검 노트", "DB와 로그 최적화"처럼 명사구로만 끝내지 않는다.
+        - 모든 설명 문장은 마침표로 끝낸다.
 
-        형식:
-        제목 : 여기에 기술
-        요약 : 여기에 기술
-        주요 글: 여기에 요약해서 기술
-        마무리 문장: 여기에 기술
+        JSON 형식:
+        {{
+            "title": "뉴스레터 제목",
+            "summary": "전체 요약",
+            "items": [
+                {{
+                    "postTitle": "게시글 제목",
+                    "summary": "게시글 요약"
+                }}
+            ],
+            "closing": "마무리 문장"
+        }}
 
         게시글 목록:
         {post_txt}
@@ -179,7 +212,7 @@ def generate_newsletter(curated_posts):
 @router.post("/curate")
 def curated_newsletter(request: CurateRequest):
     
-    activities = load_user_activities(CurateRequest.user_id)
+    activities = load_user_activities(request.user_id)
     interest_vec = calculate_user_interest(activities)
     curated_posts = similarity_search(interest_vec)
     newsletter = generate_newsletter(curated_posts)

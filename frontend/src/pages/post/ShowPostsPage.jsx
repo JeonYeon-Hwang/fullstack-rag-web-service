@@ -13,9 +13,12 @@ function ShowPostsPage(){
     const [size, setSize] = useState(10);
     const [postNum, setPostNum] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+
+    const [newsletter, setNewsletter] = useState('');
     
     const navigate = useNavigate();
     const sentinelRef = useRef(null);
+    const accessToken = localStorage.getItem("accessToken");
 
     /* page 기반하여 글 반환하기 */
     useEffect(() => {
@@ -95,7 +98,6 @@ function ShowPostsPage(){
 
     /* 글 작성으로 넘어가기 */
     const handleCreatePostClick = () => {
-        const accessToken = localStorage.getItem("accessToken");
 
         if(!accessToken){
             alert("로그인이 필요합니다");
@@ -103,6 +105,29 @@ function ShowPostsPage(){
         }
 
         navigate("/post");
+    };
+
+    /* 유저 기반 뉴스레터 받기 */
+    const handleGetNewsletterClick = async () => {
+        try{
+            setError("");
+
+            const res = await fetch(`${BACKEND_API_BASE_URL}/curate`,{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
+                },
+            });
+
+            if(!res.ok) throw new Error("뉴스레터 받기 실패");
+            const data = await res.json();
+
+            setNewsletter(data.newsletter);
+
+        }catch{
+            setError("뉴스레터를 받지 못했습니다.");
+        }
     };
 
 
@@ -125,9 +150,17 @@ function ShowPostsPage(){
 
     return (
         <div className="show-posts-page">
+            <aside className="newsletter-panel">
+                <div className="newsletter-notice">
+                    <h1>News Letter</h1>
+                </div>
+            </aside>
+
             <div className="posts-header">
                 <h1>질문 목록</h1>
+                {/* <button type="button" onClick={handleGetNewsletterClick}>뉴스레터</button> */}
                 <button type="button" onClick={handleCreatePostClick}>질문하기</button>
+                {/* <p>{newsletter}</p> */}
             </div>
 
             <div className="posts-count">
