@@ -3,6 +3,7 @@ package com.jeonny.backend.comment;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.jeonny.backend.user.UserEntity;
 import com.jeonny.backend.user.UserRepository;
+import com.jeonny.backend.userActivity.CommentCreateEvent;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class CommentService {
     
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /* 댓글 등록하기 */
     @Transactional
@@ -35,6 +38,9 @@ public class CommentService {
                 .postId(dto.getPostId())
                 .comment(dto.getComment())
                 .build();
+        
+        /* 댓글 쓰기 이벤트 생성 */
+        eventPublisher.publishEvent(new CommentCreateEvent(user_entity.getId(), dto.getPostId()));
 
         return commentRepository.save(comment_entity).getId();
     }

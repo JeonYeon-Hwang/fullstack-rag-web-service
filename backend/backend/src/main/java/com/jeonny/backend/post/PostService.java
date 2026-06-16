@@ -3,18 +3,20 @@ package com.jeonny.backend.post;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.jeonny.backend.comment.CommentRepository;
 import com.jeonny.backend.user.UserEntity;
 import com.jeonny.backend.user.UserRepository;
+import com.jeonny.backend.userActivity.PostCreateEvent;
+import com.jeonny.backend.userActivity.PostViewEvent;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,25 +29,25 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /* 글 추가하기 */
     @Transactional
     public Long addPost(PostRequestDto dto){
         /* SecurityContext에서 username => 이걸로 id도 가져오기 */
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        
-        UserEntity user_entity = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-
+        UserEntity curr_user = getCurrentUser();
         PostEntity post_entity = PostEntity.builder()
-                .userId(user_entity.getId())
+                .userId(curr_user.getId())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .tags(dto.getTags())
                 .build();
 
-        return postRepository.save(post_entity).getId();
+        Long postId = postRepository.save(post_entity).getId();
+        /* 쓰기 이벤트 발행 */
+        eventPublisher.publishEvent(new PostCreateEvent(curr_user.getId(), postId));
+
+        return postId;
     }
 
 
@@ -77,6 +79,12 @@ public class PostService {
         UserEntity user_entity = userRepository.findById(post_entity.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
+        /* 조회 이벤트 발행하기 */
+        UserEntity curr_user = getCurrentUser();
+        if(curr_user != null){
+            eventPublisher.publishEvent(new PostViewEvent(curr_user.getId(), postId));
+        }
+        
         return PostResponseDto.from(post_entity, user_entity, null);
     }
 
@@ -85,6 +93,8 @@ public class PostService {
     @Transactional
     public Boolean updatePost(Long postId, PostRequestDto dto){
         UserEntity user_entity = getCurrentUser();
+        if(user_entity == null) throw new EntityNotFoundException("현 유저를 찾을 수 없습니다.");
+
         PostEntity post_entity = getCurrentPost(postId);
         
         /* 추가 검증: 유저는 해당 글 작성자인가? */
@@ -109,8 +119,9 @@ public class PostService {
     @Transactional
     public PostResponseDto getPostPerm(Long postId){
         UserEntity user = getCurrentUser();
-        PostEntity post = getCurrentPost(postId);
+        if(user == null) throw new EntityNotFoundException("현 유저를 찾을 수 없습니다.");
 
+        PostEntity post = getCurrentPost(postId);
         if(!isPostOwner(post, user)) return null;
 
         return PostResponseDto.from(post, user, null);
@@ -123,15 +134,18 @@ public class PostService {
         return (int) postRepository.count();
     }
 
-    
+
 
     /* helper 함수들 입니다 */
     private UserEntity getCurrentUser(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        /* 비 회원일 경우의 분기 생성 */
+        if(auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())){
+            return null;
+        }
         String username = auth.getName();       
-
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+        return userRepository.findByUsername(username).orElse(null);
     }
 
     private PostEntity getCurrentPost(Long postId){

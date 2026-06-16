@@ -34,3 +34,11 @@ CREATE TABLE comment_entity (
     comment TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE user_activity_entity (
+    id BIGINT PRIMARY KEY,
+    userId BIGINT,
+    postId BIGINT,
+    activity_type VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

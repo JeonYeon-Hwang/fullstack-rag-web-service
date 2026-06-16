@@ -1,4 +1,4 @@
-package com.jeonny.backend.recommend;
+package com.jeonny.backend.aiServer;
 
 import java.util.List;
 import java.util.Map;
