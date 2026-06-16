@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import APIRouter
 from langchain_postgres.vectorstores import PGVector
 from langchain_openai import OpenAIEmbeddings
 from pydantic import BaseModel
@@ -9,9 +9,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# 서버 app 생성
-app = FastAPI()
-
+router = APIRouter()
 
 # 인자값 형식
 class RecommendRequest(BaseModel):
@@ -38,7 +36,7 @@ def get_retriever():
 
 
 # 추천 글 반환 api
-@app.post("/recommend")
+@router.post("/recommend")
 def recommend_posts(request: RecommendRequest):
     # 먼저 객체 가져오기 => 검색하여 3개 가져오기
     docs = get_retriever().invoke(request.query)
@@ -61,10 +59,3 @@ def recommend_posts(request: RecommendRequest):
 
 
     return results
-
-
-# 호출부
-if __name__=="__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)

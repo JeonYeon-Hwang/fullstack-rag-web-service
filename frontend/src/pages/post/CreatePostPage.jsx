@@ -46,7 +46,6 @@ function CreatePostPage(){
     const handleCreatePost = async (e) => {
         e.preventDefault();
         setError("");
-        return;
 
         /* 검증 로직 */
         if(

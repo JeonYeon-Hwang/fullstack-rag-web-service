@@ -19,6 +19,9 @@ function ShowPostPage(){
     const { postId } = useParams();
     const navigate = useNavigate();
 
+    /* 저장소 */
+    const token = localStorage.getItem("accessToken");
+
 
     /* 해당 글 불러오기 */
     useEffect(() => {
@@ -28,7 +31,10 @@ function ShowPostPage(){
 
                 const res = await fetch(`${BACKEND_API_BASE_URL}/post/${postId}`, {
                     method: "GET",
-                    credentials: "include"
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    credentials: "include",
                 });
 
                 if(!res.ok) throw new Error("글 불러오기 실패");

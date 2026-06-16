@@ -32,6 +32,7 @@ public class UserActEntity {
     @Column(name = "postId", nullable = false)
     private Long postId;
 
+    @Column(name = "activity_type", nullable = false)
     private String activityType;
 
     private LocalDateTime createdAt;
