@@ -25,7 +25,7 @@ public class NewsletterController {
     /* 뉴스레터 쓰기 => aiServer에서 캐치하여 사용 */
 
     /* 뉴스레터 생성 가능 여부 */
-    @GetMapping(value = "/newsletter/perm/")
+    @GetMapping(value = "/newsletter/perm")
     public ResponseEntity<Long> newsletterAvailApi(){
         return ResponseEntity.ok(newsletterservice.newsletterAvail());
     }

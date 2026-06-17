@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { generateNewsletter } from "../../util/aiUtil";
 import "./ShowPostsPage.css";
 
 const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
@@ -15,10 +16,11 @@ function ShowPostsPage(){
     const [isLoading, setIsLoading] = useState(false);
 
     const [newsletter, setNewsletter] = useState('');
-    const [canGenerateLetter, setCanGenerateLetter] = useState(false);
     const [remainTime, setRemainTime] = useState(0);
+    const [canGenerateLetter, setCanGenerateLetter] = useState(false);
     const [isLetterLoading, setIsLetterLoading] = useState(false);
-    
+    const [newsletterRefreshKey, setNewsletterRefreshKey] = useState(0);
+
     const navigate = useNavigate();
     const sentinelRef = useRef(null);
     const accessToken = localStorage.getItem("accessToken");
@@ -108,7 +110,7 @@ function ShowPostsPage(){
                     },
                 });
 
-                const remainingMinutes = res_1.data;
+                const remainingMinutes = await res_1.json(); 
 
                 if (remainingMinutes > 0) {
                     setCanGenerateLetter(false);
@@ -125,12 +127,13 @@ function ShowPostsPage(){
                     
                     if(!res_2.ok) throw new Error("뉴스레터 가져오기 실패");
 
-                    const data = await res.json();
+                    const data = await res_2.json();
                     setNewsletter(data)
 
                 } else {
                     setCanGenerateLetter(true);
                     setRemainTime(0);
+                    setNewsletter(null);
                 }
 
             }catch{
@@ -140,7 +143,7 @@ function ShowPostsPage(){
 
         getNewsletter();
 
-    }, [accessToken]);
+    }, [accessToken, newsletterRefreshKey]);
 
 
     /* 뉴스레터 설명 바 이벤트 */
@@ -148,22 +151,25 @@ function ShowPostsPage(){
         if(canGenerateLetter){
             if(!isLetterLoading){
                 return(
-                    <div>             
-                        <p>새 뉴스레터를 생성이 가능합니다.</p>
+                    <div className="newsletter-generate-row">
+                        <p>새 뉴스레터를 받을 수 있어요.</p>
                         <button
                             type="button"
-                            onClick={handleGetNewsletterClick}
+                            className="newsletter-generate-button"
+                            onClick={() => handleGetNewsletterClick()}
                         >
-                            생성하기
+                            #생성하기
                         </button>
                     </div>
                 );
-            }else{
-                return `새 뉴스레터를 생성하고 있습니다...`
             }
 
+            return (
+                <div>새 뉴스레터를 생성하고 있습니다...</div>
+            )
+            
         }else{
-            return `새 뉴스레터 생성하기 까지 ${remainTime}분 남았습니다.`;
+            return `새 뉴스레터 생성하기까지 ${remainTime}분 남았습니다.`;
         }
     }
 
@@ -191,12 +197,13 @@ function ShowPostsPage(){
             setError("");
             setIsLetterLoading(true);
 
-            const data = await handleGetNewsletterClick(accessToken);
+            const data = await generateNewsletter(accessToken);
             if(!data){
                 setError("뉴스레터를 생성하지 못했습니다.");
             }
 
-            setNewsletter(data);
+            setNewsletterRefreshKey((prev) => prev + 1);
+
         }catch(error){
             throw new Error("에러: " + error);
         }finally{
@@ -231,15 +238,44 @@ function ShowPostsPage(){
                     <p>해당 정보를 바탕으로 글과 요약본을 전달해드려요</p>
                     <h1>뉴스레터를 받아보세요</h1>
                     <p>유저의 활동 데이터를 바탕으로 레터를 생성합니다</p>
-                {accessToken ? (
-                    <p>{handleNewsletterDescriptionBar}</p>
-                ) : (
-                    <p>로그인을 하여 맞춤 뉴스레터를 받아보세요</p>
-                )}
+                    <div className="newsletter-status">
+                        {accessToken ? (
+                            handleNewsletterDescriptionBar()
+                        ) : (
+                            <p>로그인을 하여 맞춤 뉴스레터를 받아보세요</p>
+                        )}
+                    </div>
                 </div>
-                {accessToken ? (
-                    <div>
-                        {newsletter}
+                {accessToken && isLetterLoading ? (
+                    <div className="newsletter-result newsletter-result-skeleton">
+                        {Array.from({ length: 2 }).map((_, index) => (
+                            <div className="newsletter-result-card newsletter-skeleton-card" key={index}>
+                                <div className="newsletter-skeleton-title" />
+                                <div className="newsletter-skeleton-line" />
+                                <div className="newsletter-skeleton-line short" />
+                            </div>
+                        ))}
+                    </div>
+                ) : accessToken && newsletter ? (
+                    <div className="newsletter-result">
+                        <section className="newsletter-result-card newsletter-summary-card">
+                            <h2>뉴스레터: {newsletter?.title}</h2>
+                            <p>{newsletter?.metadata?.summary}</p>
+                            <p>{newsletter?.metadata?.closing}</p>
+                        </section>
+                        <div className="newsletter-result-card newsletter-items-card">
+                            <h2 className="newsletter-items-heading">이 글을 읽어보세요</h2>
+                            {newsletter?.metadata?.items?.map((item, index) => (
+                                <section
+                                    className="newsletter-result-section newsletter-item"
+                                    key={item.postId ?? index}
+                                    onClick={() => handlePostClick(item.postId)}
+                                >
+                                    <h3>{item.postTitle}</h3>
+                                    <p>{item.summary}</p>
+                                </section>
+                            ))}
+                        </div>
                     </div>
                 ) : (
                     <div>

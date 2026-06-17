@@ -2,6 +2,7 @@ import os
 import requests
 import numpy as np
 import psycopg
+import json
 
 from pydantic import BaseModel
 from datetime import datetime
@@ -125,6 +126,7 @@ def similarity_search(interest_vec):
 
     query = """
         SELECT 
+            e.cmetadata->>'post_id' AS post_id,
             e.cmetadata->>'title' AS title,
             e.cmetadata->>'content' AS content,  
             e.embedding <=> %s::vector AS distance
@@ -148,9 +150,10 @@ def similarity_search(interest_vec):
     # 객체화
     return [
         {
-            "title": row[0],
-            "content": row[1],
-            "distance": row[2],
+            "postId": row[0],
+            "title": row[1],
+            "content": row[2],
+            "distance": row[3],
         }
         for row in rows
     ]
@@ -184,6 +187,8 @@ def generate_newsletter(curated_posts):
         - reason은 왜 추천하는지 1문장으로 쓴다.
         - item summary는 게시글 내용을 1~2문장으로 쓴다.
         - "성능 점검 노트", "DB와 로그 최적화"처럼 명사구로만 끝내지 않는다.
+        - postId는 선정된 실제 해당 postId를 넣는다.
+        - postTitle은 실제 해당 게시글의 제목으로 적는다.
         - 모든 설명 문장은 마침표로 끝낸다.
 
         JSON 형식:
@@ -193,7 +198,8 @@ def generate_newsletter(curated_posts):
             "items": [
                 {{
                     "postTitle": "게시글 제목",
-                    "summary": "게시글 요약"
+                    "summary": "게시글 요약",
+                    "postId: "게시글 아이디"
                 }}
             ],
             "closing": "마무리 문장"
@@ -205,7 +211,7 @@ def generate_newsletter(curated_posts):
     )
 
     print(response.output_text)
-    return response.output_text
+    return json.loads(response.output_text)
 
 
 # 추천 글 생성 => db에 쓰기
