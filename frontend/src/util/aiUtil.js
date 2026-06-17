@@ -20,10 +20,8 @@ export async function recommend(query) {
 
 
 /* 유저 기반 뉴스레터 생성하여 받기 */
-export async function handleGetNewsletterClick(accessToken) {
+export async function generateNewsletter(accessToken) {
     try{
-        setError("");
-
         const res = await fetch(`${import.meta.env.VITE_BACKEND_API_BASE_URL}/curate`,{
             method: "GET",
             headers: {
@@ -38,6 +36,6 @@ export async function handleGetNewsletterClick(accessToken) {
         return data;
 
     }catch{
-        setError("뉴스레터를 생성하지 못했습니다.");
-        }
+        throw new Error("뉴스레터 생성 중 오류가 발생하였습니다.");
+    }
 }
