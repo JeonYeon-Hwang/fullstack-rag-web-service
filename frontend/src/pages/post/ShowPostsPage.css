@@ -61,6 +61,24 @@ body:has(.show-posts-page) {
     font-weight: 700;
 }
 
+.newsletter-notice p {
+    margin: 7.8px 0 0;
+}
+
+.newsletter-notice p:last-child {
+    margin-bottom: 0;
+}
+
+.newsletter-notice p + h1 {
+    margin-top: 12px;
+    margin-right: -14px;
+    margin-left: -14px;
+    border-top: 1px solid #e6d6a8;
+    padding-right: 14px;
+    padding-top: 12px;
+    padding-left: 14px;
+}
+
 .posts-header h1 {
     margin: 0;
     padding-left: 12px;

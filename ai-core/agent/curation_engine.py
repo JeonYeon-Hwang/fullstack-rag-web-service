@@ -208,7 +208,7 @@ def generate_newsletter(curated_posts):
     return response.output_text
 
 
-# 추천 글 반환 api
+# 추천 글 생성 => db에 쓰기
 @router.post("/curate")
 def curated_newsletter(request: CurateRequest):
     
@@ -217,4 +217,12 @@ def curated_newsletter(request: CurateRequest):
     curated_posts = similarity_search(interest_vec)
     newsletter = generate_newsletter(curated_posts)
 
-    return newsletter
+    # 반환된 객체는 spring에서 db에 저장이 됨
+    return {
+        "title": newsletter["title"],
+        "metadata": {
+            "summary": newsletter["summary"],
+            "items": newsletter["items"],
+            "closing": newsletter["closing"],
+        }
+    }

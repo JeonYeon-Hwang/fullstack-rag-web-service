@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.jeonny.backend.newsletter.NewsletterResponseDto;
+import com.jeonny.backend.newsletter.NewsletterService;
 import com.jeonny.backend.user.UserEntity;
 import com.jeonny.backend.user.UserRepository;
 
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class CurateController {
     
     private final UserRepository userRepository;
+    private final NewsletterService newsletterService;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -29,7 +32,7 @@ public class CurateController {
 
     /* 특정 유저 활동기록 발송 로직 */
     @GetMapping("/curate")
-        public ResponseEntity<Map<String, Object>> getRecommendation(
+        public ResponseEntity<NewsletterResponseDto> getRecommendation(
         ){
         try{
             String targetUrl = pythonAiServerUrl + "/curate";
@@ -40,17 +43,18 @@ public class CurateController {
             UserEntity user_entity = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException(username));
 
-            /* 전달 객체 만들기 */
-            Map<String, Object> body = Map.of(
-                "user_id", user_entity.getId()
-            );
-            
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                targetUrl, body, String.class);
+            /* 전달 객체 만들기 */        
+            ResponseEntity<NewsletterResponseDto> response = restTemplate.postForEntity(
+                targetUrl, 
+                Map.of("user_id", user_entity.getId()),
+                NewsletterResponseDto.class);
+            NewsletterResponseDto result = response.getBody();
 
-            return ResponseEntity.ok(Map.of(
-                "newsletter", response.getBody()
-            ));
+            /* 저장 시행 */
+            newsletterService.saveNewsletter(result, user_entity);
+
+            /* 이후 반환 */
+            return ResponseEntity.ok(result);
 
         }catch(Exception e){
             return ResponseEntity.status(500).body(null);

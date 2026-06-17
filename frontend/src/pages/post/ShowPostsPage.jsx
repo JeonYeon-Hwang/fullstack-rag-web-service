@@ -15,6 +15,9 @@ function ShowPostsPage(){
     const [isLoading, setIsLoading] = useState(false);
 
     const [newsletter, setNewsletter] = useState('');
+    const [canGenerateLetter, setCanGenerateLetter] = useState(false);
+    const [remainTime, setRemainTime] = useState(0);
+    const [isLetterLoading, setIsLetterLoading] = useState(false);
     
     const navigate = useNavigate();
     const sentinelRef = useRef(null);
@@ -91,6 +94,81 @@ function ShowPostsPage(){
     });
 
 
+    /* 뉴스레터 생성 트리거 */
+    useEffect(() => {
+        const getNewsletter = async () => {
+            try{
+                setError("");
+                /* 생성 가능한지 여부 확인하기 */
+                const res_1 = await fetch(`${BACKEND_API_BASE_URL}/newsletter/perm`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${accessToken}`
+                    },
+                });
+
+                const remainingMinutes = res_1.data;
+
+                if (remainingMinutes > 0) {
+                    setCanGenerateLetter(false);
+                    setRemainTime(remainingMinutes);
+
+                    /* 기존에 생성된 뉴스레터를 가져온다 */
+                    const res_2 = await fetch(`${BACKEND_API_BASE_URL}/newsletter`,{
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${accessToken}`
+                        },
+                    });
+                    
+                    if(!res_2.ok) throw new Error("뉴스레터 가져오기 실패");
+
+                    const data = await res.json();
+                    setNewsletter(data)
+
+                } else {
+                    setCanGenerateLetter(true);
+                    setRemainTime(0);
+                }
+
+            }catch{
+                setError("뉴스레터를 가져오지 못했습니다.");
+            }
+        }
+
+        getNewsletter();
+
+    }, [accessToken]);
+
+
+    /* 뉴스레터 설명 바 이벤트 */
+    const handleNewsletterDescriptionBar = () => {
+        if(canGenerateLetter){
+            if(!isLetterLoading){
+                return(
+                    <div>             
+                        <p>새 뉴스레터를 생성이 가능합니다.</p>
+                        <button
+                            type="button"
+                            onClick={handleGetNewsletterClick}
+                        >
+                            생성하기
+                        </button>
+                    </div>
+                );
+            }else{
+                return `새 뉴스레터를 생성하고 있습니다...`
+            }
+
+        }else{
+            return `새 뉴스레터 생성하기 까지 ${remainTime}분 남았습니다.`;
+        }
+    }
+
+
+
     /* 해당 글로 넘어가기 */
     const handlePostClick = (postId) => {
         navigate(`/post/${postId}`);
@@ -107,28 +185,24 @@ function ShowPostsPage(){
         navigate("/post");
     };
 
-    /* 유저 기반 뉴스레터 받기 */
+    /* 뉴스레터 생성하기 */
     const handleGetNewsletterClick = async () => {
         try{
             setError("");
+            setIsLetterLoading(true);
 
-            const res = await fetch(`${BACKEND_API_BASE_URL}/curate`,{
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`
-                },
-            });
+            const data = await handleGetNewsletterClick(accessToken);
+            if(!data){
+                setError("뉴스레터를 생성하지 못했습니다.");
+            }
 
-            if(!res.ok) throw new Error("뉴스레터 받기 실패");
-            const data = await res.json();
-
-            setNewsletter(data.newsletter);
-
-        }catch{
-            setError("뉴스레터를 받지 못했습니다.");
+            setNewsletter(data);
+        }catch(error){
+            throw new Error("에러: " + error);
+        }finally{
+            setIsLetterLoading(false);
         }
-    };
+    }
 
 
     /* 날짜 형식 변환 */
@@ -152,15 +226,31 @@ function ShowPostsPage(){
         <div className="show-posts-page">
             <aside className="newsletter-panel">
                 <div className="newsletter-notice">
-                    <h1>News Letter</h1>
+                    <h1>생성형 AI 기반 뉴스레터</h1>
+                    <p>다음과 같은 정보를 수집합니다: 읽기, 쓰기, 생성 </p>
+                    <p>해당 정보를 바탕으로 글과 요약본을 전달해드려요</p>
+                    <h1>뉴스레터를 받아보세요</h1>
+                    <p>유저의 활동 데이터를 바탕으로 레터를 생성합니다</p>
+                {accessToken ? (
+                    <p>{handleNewsletterDescriptionBar}</p>
+                ) : (
+                    <p>로그인을 하여 맞춤 뉴스레터를 받아보세요</p>
+                )}
                 </div>
+                {accessToken ? (
+                    <div>
+                        {newsletter}
+                    </div>
+                ) : (
+                    <div>
+
+                    </div>
+                )}
             </aside>
 
             <div className="posts-header">
                 <h1>질문 목록</h1>
-                {/* <button type="button" onClick={handleGetNewsletterClick}>뉴스레터</button> */}
                 <button type="button" onClick={handleCreatePostClick}>질문하기</button>
-                {/* <p>{newsletter}</p> */}
             </div>
 
             <div className="posts-count">
