@@ -168,6 +168,7 @@ def generate_newsletter(curated_posts):
         제목: {post.get("title")}
         내용: {post.get("content")}
         태그: {post.get("tags")}
+        게시글 ID: {post.get("postId")}
         """
         for post in curated_posts
     ])
@@ -187,7 +188,6 @@ def generate_newsletter(curated_posts):
         - reason은 왜 추천하는지 1문장으로 쓴다.
         - item summary는 게시글 내용을 1~2문장으로 쓴다.
         - "성능 점검 노트", "DB와 로그 최적화"처럼 명사구로만 끝내지 않는다.
-        - postId는 선정된 실제 해당 postId를 넣는다.
         - postTitle은 실제 해당 게시글의 제목으로 적는다.
         - 모든 설명 문장은 마침표로 끝낸다.
 
