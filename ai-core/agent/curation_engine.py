@@ -150,9 +150,10 @@ def similarity_search(interest_vec):
     # 객체화
     return [
         {
-            "title": row[0],
-            "content": row[1],
-            "distance": row[2],
+            "postId": row[0],
+            "title": row[1],
+            "content": row[2],
+            "distance": row[3],
         }
         for row in rows
     ]
@@ -187,6 +188,7 @@ def generate_newsletter(curated_posts):
         - item summary는 게시글 내용을 1~2문장으로 쓴다.
         - "성능 점검 노트", "DB와 로그 최적화"처럼 명사구로만 끝내지 않는다.
         - postId는 선정된 실제 해당 postId를 넣는다.
+        - postTitle은 실제 해당 게시글의 제목으로 적는다.
         - 모든 설명 문장은 마침표로 끝낸다.
 
         JSON 형식:

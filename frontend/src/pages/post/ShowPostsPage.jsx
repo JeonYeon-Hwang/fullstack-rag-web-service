@@ -151,13 +151,14 @@ function ShowPostsPage(){
         if(canGenerateLetter){
             if(!isLetterLoading){
                 return(
-                    <div>             
+                    <div className="newsletter-generate-row">
                         <p>새 뉴스레터를 받을 수 있어요.</p>
                         <button
                             type="button"
+                            className="newsletter-generate-button"
                             onClick={() => handleGetNewsletterClick()}
                         >
-                            생성하기
+                            #생성하기
                         </button>
                     </div>
                 );
@@ -245,7 +246,17 @@ function ShowPostsPage(){
                         )}
                     </div>
                 </div>
-                {accessToken && newsletter ? (
+                {accessToken && isLetterLoading ? (
+                    <div className="newsletter-result newsletter-result-skeleton">
+                        {Array.from({ length: 2 }).map((_, index) => (
+                            <div className="newsletter-result-card newsletter-skeleton-card" key={index}>
+                                <div className="newsletter-skeleton-title" />
+                                <div className="newsletter-skeleton-line" />
+                                <div className="newsletter-skeleton-line short" />
+                            </div>
+                        ))}
+                    </div>
+                ) : accessToken && newsletter ? (
                     <div className="newsletter-result">
                         <section className="newsletter-result-card newsletter-summary-card">
                             <h2>뉴스레터: {newsletter?.title}</h2>
