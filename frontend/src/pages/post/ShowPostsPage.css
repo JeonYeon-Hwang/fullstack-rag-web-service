@@ -189,6 +189,17 @@ body:has(.show-posts-page) {
     margin: 7.8px 0 0;
 }
 
+.newsletter-summary-list {
+    margin: 7.8px 0 0;
+    padding-left: 18px;
+    color: #3b4045;
+    line-height: 1.55;
+}
+
+.newsletter-summary-list li + li {
+    margin-top: 4px;
+}
+
 .newsletter-result-section > p:first-child {
     margin-top: 0;
 }

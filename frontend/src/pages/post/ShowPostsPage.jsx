@@ -5,6 +5,13 @@ import "./ShowPostsPage.css";
 
 const BACKEND_API_BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 
+const splitSummarySentences = (summary = "") => (
+    summary
+        .split(/(?<=[.!?。！？]|[가-힣]\.)\s+/)
+        .map((sentence) => sentence.trim())
+        .filter(Boolean)
+);
+
 function ShowPostsPage(){
 
     /* 저장용 변수 */
@@ -134,6 +141,20 @@ function ShowPostsPage(){
                     setCanGenerateLetter(true);
                     setRemainTime(0);
                     setNewsletter(null);
+
+                    const res_2 = await fetch(`${BACKEND_API_BASE_URL}/newsletter`,{
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${accessToken}`
+                        },
+                    });
+
+                    const data = await res_2.json();
+                    
+                    if(data != null){
+                        setNewsletter(data)
+                    }
                 }
 
             }catch{
@@ -272,14 +293,18 @@ function ShowPostsPage(){
                                     onClick={() => handlePostClick(item.postId)}
                                 >
                                     <h3>{item.postTitle}</h3>
-                                    <p>{item.summary}</p>
+                                    <ul className="newsletter-summary-list">
+                                        {splitSummarySentences(item.summary).map((sentence, sentenceIndex) => (
+                                            <li key={sentenceIndex}>{sentence}</li>
+                                        ))}
+                                    </ul>
                                 </section>
                             ))}
                         </div>
                     </div>
                 ) : (
                     <div>
-
+                        
                     </div>
                 )}
             </aside>

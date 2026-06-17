@@ -120,7 +120,7 @@ def calculate_user_interest(activities):
     return user_interest_vec
 
 
-# interest 벡터와 db속 벡터 간의 인접도를 통해 글 3개를 검색한다
+# interest 벡터와 db속 벡터 간의 인접도를 통해 글 2개를 검색한다
 def similarity_search(interest_vec):
     print("Search embedding db by interest vector...")
 
