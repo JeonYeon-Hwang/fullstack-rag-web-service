@@ -3,7 +3,7 @@
 
 ### 1. 프로젝트 개요
 
-Stack Overflow를 모방한 웹 프로젝트.  
+Stack Overflow를 모방한 웹 프로젝트, **Stack Underflow**  
 선정 이유: 게시판 형식에 충실, 글 => 댓글 종속관계 명확, 지식기반 형태(AI 데이터 활용에 적합)  
   
 **주요 기능**
@@ -55,7 +55,7 @@ flowchart LR
 |함수 명|기능|구조 해설|
 |:---|:---|:---|
 |`load_user_activities`|유저 활동 기록 수집|Spring에서 특정 유저의 **활동기록** DB를 가져온다 => 이를 List 형태의 객체로 만들어 반환|
-|`calculate_user_interest`|interest 백터값 산출|활동기록(게시글에서의 VIEW, COMMENT, CREATE)의 각각 가중치 부여 => 해당 게시글의 임베딩 백터를 통해 **가중치 평균 산출**|
+|`calculate_user_interest`|<span style="color:red">interest 백터값</span> 산출|활동기록(게시글에서의 VIEW, COMMENT, CREATE)의 각각 가중치 부여 => 해당 게시글의 임베딩 백터를 통해 **가중치 평균 산출**|
 |`similarity_search`|게시글 검색|interest 백터값과 유사한 백터(postId)를 2개를 찾아내어 반환|
 |`generate_newsletter`|뉴스레터 생성|OpenAI에 instruction과 input을 제공하여, JSON 형식 뉴스레터 생성을 지시|
 
@@ -122,3 +122,14 @@ flowchart TD
 Spring의 경우, 처음부터 계층화된 설계를 한 만큼 확장에 용이하였으나,  
 React은 페이지 단위로 나누고, 기능(컴포넌트)은 안에 내장되어 있어 파일이 비대해지는 문제가 발생.  
 빠른 구현이 우선시 된 만큼, 비대한 정도를 감당하는 방향으로 결정하였으나, 아쉬움이 남음.  
+<br>  
+
+**개선 방향**
+지엽적이라도, 향구 개발에 필수인 타입 일치/필드 누락과 같은 문제라도,  
+직접 디버깅을 하여 찾아내고 고치는 역량을 기르고 싶음.  
+아키텍처 세부 디테일한 요소도 머릿속에 그림을 그려 완성을 하는 역량을 키우기로.  
+
+서비스의 완성도를 낮추는 요소 정리:
+pageable: 페이지 끝에 도달 시, 마지막임을 알려 next page 호출 막기  
+활동기록 DB: 활동기록이 충분치 않을 때, 뉴스레터 제공이 불가함 로직 추가  
+cascade: 종속관계를 명확히 하여 삭제 시, 정합성이 깨지지 않도록 하기  
